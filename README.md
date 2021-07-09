@@ -8,7 +8,7 @@ This project aims to create a fully functioning HPC cluster deployable on Kubern
 
 ## TL;DR:
 
-To deploy/use the HPC cluster, you will need a functioning Kubernetes deployment on Ubuntu 20.04 (we typically use [k3s](https://k3s.io/) or [k3d](https://k3d.io/) with a little extra configuration). If you use another OS, your mileage may vary.
+To deploy/use the HPC cluster, you will need a functioning Kubernetes  cluster (we typically use **[k3s](https://k3s.io/)**) with host machines running **Ubuntu 20.04 LTS**. If you use another OS, your mileage may vary. You will also need to have the **NFS client** package/utilites installed **on all host machines in your cluster** so that your containers can mount the NFS server for the HPC cluster: `sudo apt-get install nfs-common`
 
 From the terminal, generally follow these steps:
 
