@@ -82,7 +82,6 @@ ssh jovyan@10.43.171.12
 9. Download a testing singularity image (mpitest.sif), allocate a node on the cluster (8 procs by default), run the singularity job over OpenMPI, and then exit out.
 ```sh
 wget https://www.cs.mtsu.edu/~jphillips/mpitest.sif
-salloc -n 8 /bin/sh
 sinfo
 ```
 ```text
