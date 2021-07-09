@@ -4,11 +4,11 @@
 
 ## Purpose:
 
-This project aims to create a fully functioning HPC cluster deployable on Kubernetes. The cluster will utilize Singularity containers for software management so that the deployed HPC cluster is capable of running any scientific application over MPI/SLURM. An NFS server and OpenLDAP server are also used to provide the shared file system and user authentication for the cluster.
+This project aims to create a fully functioning HPC cluster deployable on Kubernetes. The cluster will utilize Singularity containers for software management so that the deployed HPC cluster is capable of running any scientific application over Singularity/OpenMPI/SLURM. An NFS server and OpenLDAP server are also used to provide the shared file system and user authentication for the cluster (these could be replaced with already-existing alternatives if need-be).
 
 ## TL;DR:
 
-To deploy/use the HPC cluster, you will need a functioning Kubernetes deployment (we typically use [k3s](https://k3s.io/) or [k3d](https://k3d.io/)).
+To deploy/use the HPC cluster, you will need a functioning Kubernetes deployment on Ubuntu 20.04 (we typically use [k3s](https://k3s.io/) or [k3d](https://k3d.io/) with a little extra configuration). If you use another OS, your mileage may vary.
 
 From the terminal, generally follow these steps:
 
@@ -36,7 +36,7 @@ kubectl -n hpc create -f 02-nfs-server.yaml
 ```sh
 kubectl -n hpc get svc
 ```
-```text=
+```text
 NAME   TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)                      AGE
 nfs    ClusterIP   10.43.203.4   <none>        2049/TCP,20048/TCP,111/TCP   11s
 ```
@@ -64,7 +64,7 @@ kubectl -n hpc create -f 03-cluster.yaml
 ```sh
 kubectl -n hpc get svc
 ```
-```
+```text
 NAME       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
 nfs        ClusterIP   10.43.203.4     <none>        2049/TCP,20048/TCP,111/TCP   16m
 openldap   ClusterIP   10.43.232.229   <none>        1389/TCP                     10m
@@ -79,7 +79,7 @@ ssh jovyan@10.43.171.12
 ```
 
 
-9. Download a testing singularity image (mpitest.sif), allocate part of the cluster, run the singularity job, and then exit out.
+9. Download a testing singularity image (mpitest.sif), allocate a node on the cluster (8 procs by default), run the singularity job over OpenMPI, and then exit out.
 ```sh
 wget https://www.cs.mtsu.edu/~jphillips/mpitest.sif
 salloc -n 8 /bin/sh
@@ -95,11 +95,56 @@ salloc -n 8 /bin/sh
 ```text
 salloc: Granted job allocation 4
 ```
+```sh
 sinfo
+```
+```text
     PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
     batch*       up 7-00:00:00      1  alloc agent-0
     batch*       up 7-00:00:00      3   idle agent-[1-3]
+```
+```sh
+mpiexec -n 8 singularity run mpitest.sif /opt/mpitest
+```
+Then you should see the ranks complete the computation (shown WARNINGS still being resolved but shouldn't have any significant impact on the calculations):
+```text
+WARNING: group: unknown groupid 1000
+WARNING: group: unknown groupid 1000
+WARNING: group: unknown groupid 1000
+WARNING: group: unknown groupid 1000
+WARNING: group: unknown groupid 1000
+WARNING: group: unknown groupid 1000
+WARNING: group: unknown groupid 1000
+WARNING: group: unknown groupid 1000
+Hello, I am rank 0/8
+Hello, I am rank 3/8
+Hello, I am rank 4/8
+Hello, I am rank 5/8
+Hello, I am rank 7/8
+Hello, I am rank 1/8
+Hello, I am rank 2/8
+Hello, I am rank 6/8
+```
+Drop out of the job shell:
+```sh
+exit
+```
+You can now run any SLURM job in the batch queue provided (see the SLURM docs). Log out of the cluster using `exit` again if you are finished testing.
 
+
+10. Tear it all down. This will usually take less time than just deleteing the namespace first (since some pods will hang waiting to close out the NFS connections if the NFS server shuts down too quickly), and also allows more control over the break-down process:
+First shutdown the OpenLDAP, Scheduler, Workers, and *then* shut down the NFS server:
+```sh
+kubectl -n hpc delete -f 03-cluster.yaml
+kubectl -n hpc delete -f 02-nfs-server.yaml
+```
+(OPTIONAL) if you also *want* to delete the filesystem data (you can skip this step if you want the data to be available if/when you bring the cluster up again later):
+```sh
+kubectl -n hpc delete -f 01-nfs-volume.yaml
+```
+After this you can remove the namespace (even if you skipped the optional step above):
+```sh
+kubectl delete namespace hpc
 ```
 
 
