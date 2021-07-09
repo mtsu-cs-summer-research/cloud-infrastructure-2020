@@ -1,0 +1,14 @@
+Bootstrap: docker
+From: ubuntu:focal
+
+%files
+    mpitest.c /opt
+
+%post
+    echo "Installing required packages..."
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+	openmpi-bin \
+	gromacs-openmpi
+	# mpich \
+	# gromacs-mpich
+

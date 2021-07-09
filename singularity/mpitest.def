@@ -1,0 +1,22 @@
+Bootstrap: docker
+From: ubuntu:focal
+
+%files
+    mpitest.c /opt
+
+%post
+    echo "Installing required packages..."
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+	wget \
+	git \
+	bash \
+	gcc \
+	gfortran \
+	g++ \
+	make \
+	file \
+	openmpi-bin
+        # mpich
+
+    echo "Compiling the MPI application..."
+    cd /opt && mpicc -o mpitest mpitest.c
