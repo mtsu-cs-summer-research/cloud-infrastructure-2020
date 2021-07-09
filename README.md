@@ -79,7 +79,7 @@ ssh jovyan@10.43.171.12
 ```
 
 
-9. Download a testing singularity image (mpitest.sif), allocate a node on the cluster (8 procs by default), run the singularity job over OpenMPI, and then exit out.
+9. Download a testing singularity image (mpitest.sif), allocate a node on the cluster (8 procs by default), run the singularity job over OpenMPI, and then exit out:
 ```sh
 wget https://www.cs.mtsu.edu/~jphillips/mpitest.sif
 sinfo
@@ -105,7 +105,7 @@ batch*       up 7-00:00:00      3   idle agent-[1-3]
 ```sh
 mpiexec -n 8 singularity run mpitest.sif /opt/mpitest
 ```
-Then you should see the ranks complete the computation (shown WARNINGS still being resolved but shouldn't have any significant impact on the calculations):
+Now you should see the ranks complete the computation (shown WARNINGS still being resolved but shouldn't have any significant impact on the calculations):
 ```text
 WARNING: group: unknown groupid 1000
 WARNING: group: unknown groupid 1000
