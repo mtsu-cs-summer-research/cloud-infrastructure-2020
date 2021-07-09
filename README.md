@@ -129,10 +129,10 @@ Drop out of the job shell:
 ```sh
 exit
 ```
-You can now run any SLURM job in the batch queue provided (see the SLURM docs). Log out of the cluster using `exit` again if you are finished testing.
+You can now run any SLURM job in the `batch` queue as-provided (see the SLURM docs). Log out of the cluster using `exit` again if you are finished testing.
 
 
-10. Tear it all down. This will usually take less time than just deleteing the namespace first (since some pods will hang waiting to close out the NFS connections if the NFS server shuts down too quickly), and also allows more control over the break-down process:
+10. Tear it all down. This will usually takes less time than just deleting the namespace (since some pods will hang waiting to close out the NFS connections if the NFS server shuts down too quickly), and also allows more control over the break-down process:
 First shutdown the OpenLDAP, Scheduler, Workers, and *then* shut down the NFS server:
 ```sh
 kubectl -n hpc delete -f 03-cluster.yaml
