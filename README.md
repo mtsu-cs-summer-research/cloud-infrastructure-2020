@@ -36,7 +36,7 @@ kubectl -n hpc create -f 02-nfs-server.yaml
 ```sh
 kubectl -n hpc get svc
 ```
-```text
+```text=
 NAME   TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)                      AGE
 nfs    ClusterIP   10.43.203.4   <none>        2049/TCP,20048/TCP,111/TCP   11s
 ```
@@ -63,11 +63,13 @@ kubectl -n hpc create -f 03-cluster.yaml
 7. Determine the IP address of the login node:
 ```sh
 kubectl -n hpc get svc
-    NAME       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
-    nfs        ClusterIP   10.43.203.4     <none>        2049/TCP,20048/TCP,111/TCP   16m
-    openldap   ClusterIP   10.43.232.229   <none>        1389/TCP                     10m
-    mpi        ClusterIP   None            <none>        <none>                       10m
-    login      ClusterIP   10.43.171.12    <none>        22/TCP                       10m
+```
+```
+NAME       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+nfs        ClusterIP   10.43.203.4     <none>        2049/TCP,20048/TCP,111/TCP   16m
+openldap   ClusterIP   10.43.232.229   <none>        1389/TCP                     10m
+mpi        ClusterIP   None            <none>        <none>                       10m
+login      ClusterIP   10.43.171.12    <none>        22/TCP                       10m
 ```
 
 
@@ -82,10 +84,17 @@ ssh jovyan@10.43.171.12
 wget https://www.cs.mtsu.edu/~jphillips/mpitest.sif
 salloc -n 8 /bin/sh
 sinfo
-    PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
-    batch*       up 7-00:00:00      4   idle agent-[0-3]
+```
+```text
+PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+batch*       up 7-00:00:00      4   idle agent-[0-3]
+```
+```sh
 salloc -n 8 /bin/sh
-    salloc: Granted job allocation 4
+```
+```text
+salloc: Granted job allocation 4
+```
 sinfo
     PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
     batch*       up 7-00:00:00      1  alloc agent-0
