@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: openldap-test
+  labels:
+    role: testing
+spec:
+  containers:
+    - name: openldap-test
+      image: jlphillips/openldap-login
+      ports:
+        - name: ssh
+          containerPort: 22
+          protocol: TCP
