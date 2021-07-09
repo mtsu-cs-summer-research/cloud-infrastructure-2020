@@ -99,9 +99,9 @@ salloc: Granted job allocation 4
 sinfo
 ```
 ```text
-    PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
-    batch*       up 7-00:00:00      1  alloc agent-0
-    batch*       up 7-00:00:00      3   idle agent-[1-3]
+PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+batch*       up 7-00:00:00      1  alloc agent-0
+batch*       up 7-00:00:00      3   idle agent-[1-3]
 ```
 ```sh
 mpiexec -n 8 singularity run mpitest.sif /opt/mpitest
