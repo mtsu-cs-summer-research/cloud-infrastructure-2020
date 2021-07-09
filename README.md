@@ -14,8 +14,8 @@ From the terminal, generally follow these steps:
 
 1. Clone the repository and change working directory to the base directory of the repository.
 ```sh
-$ git clone https://github.com/mtsu-cs-summer-research/cloud-infrastructure-2020.git
-$ cd cloud-infrastructure-2020
+git clone https://github.com/mtsu-cs-summer-research/cloud-infrastructure-2020.git
+cd cloud-infrastructure-2020
 ```
 
 
@@ -35,11 +35,13 @@ kubectl -n hpc create -f 02-nfs-server.yaml
 4. Find the IP address of the NFS server and edit 03-cluster.yaml (line 13) to contain the correct IP address:
 ```sh
 kubectl -n hpc get svc
-    NAME   TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)                      AGE
-    nfs    ClusterIP   10.43.203.4   <none>        2049/TCP,20048/TCP,111/TCP   11s
+```
+```text
+NAME   TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)                      AGE
+nfs    ClusterIP   10.43.203.4   <none>        2049/TCP,20048/TCP,111/TCP   11s
 ```
 Change 03-cluster.yaml (line 13) accordingly:
-```
+```text
   nfs:
     # Must be manually updated each re-deployment
     server: 10.43.203.4
