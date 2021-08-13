@@ -16,11 +16,11 @@ if [ -f /etc/munge/munge.key.tmp ]; then
 
   service munge start
 
-  if [ `hostname` != 'server' ]; then
+  if [ `hostname` != 'scheduler' ]; then
     echo "Node type: agent"
     service slurmd start
   else
-    echo "Node type: server"
+    echo "Node type: scheduler"
     service slurmctld start
   fi
 fi

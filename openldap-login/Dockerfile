@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:20.04
 LABEL maintainer="Joshua L. Phillips <https://www.cs.mtsu.edu/~jphillips/>"
 
 USER root
@@ -24,8 +24,8 @@ RUN apt-get update && \
 
 # Download/Compile Singularity
 WORKDIR /root
-RUN wget https://github.com/hpcng/singularity/releases/download/v3.6.1/singularity-3.6.1.tar.gz
-RUN tar -xzf singularity-3.6.1.tar.gz
+RUN wget https://github.com/hpcng/singularity/releases/download/v3.6.2/singularity-3.6.2.tar.gz
+RUN tar -xzf singularity-3.6.2.tar.gz
 WORKDIR /root/singularity
 RUN ./mconfig && \
     make -C ./builddir && \
