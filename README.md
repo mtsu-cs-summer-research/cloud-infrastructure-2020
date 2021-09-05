@@ -73,7 +73,7 @@ login      ClusterIP   10.43.171.12    <none>        22/TCP                     
 ```
 
 
-8. Use SSH to log into the scheduler (default username is `jovyan` and the default password is `password`):
+8. Use SSH to log into the scheduler (default username is `jovyan` and the default password is `password`). If you are using **k3d**, then you should probably use `kubectl exec -it deployment/scheduler -- /bin/bash` and then try the ssh command below since ClusterIPs are not accessible outside of the k3s container(s):
 ```sh
 ssh jovyan@10.43.171.12
 ```
