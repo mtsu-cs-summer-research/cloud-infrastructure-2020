@@ -186,9 +186,13 @@ Additional issues left to be fixed:
 # Contributors
 
 Daniel Cox
+
 Joshua L. Phillips (MTSU - Joshua.Phillips@mtsu.edu)
+
 Terryn Seaton
+
 Jessica Wijaya
+
 Hannah Williams
 
-Copyright 2021 - MTSU CS S-STEM Summer Research Group
+### Copyright 2021 - MTSU CS S-STEM Summer Research Group
