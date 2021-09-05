@@ -8,7 +8,7 @@ This project aims to create a fully functioning HPC cluster deployable on Kubern
 
 ## TL;DR:
 
-To deploy/use the HPC cluster, you will need a functioning Kubernetes  cluster (we typically use **[k3s](https://k3s.io/)**) with host machines running **Ubuntu 20.04 LTS**. If you use another OS, your mileage may vary. You will also need to have the **NFS client** package/utilites installed **on all host machines in your cluster** so that your containers can mount the NFS server for the HPC cluster: `sudo apt-get install nfs-common`
+To deploy/use the HPC cluster, you will need a functioning Kubernetes  cluster (we typically use **[k3s](https://k3s.io/)**) with host machines running **Ubuntu 20.04 LTS**. If you use another OS, your mileage may vary. You will also need to have the **NFS client** package/utilites installed **on all host machines in your cluster** so that your containers can mount the NFS server for the HPC cluster: `sudo apt-get install nfs-common` If you use **[k3d](https://k3d.io/)** (k3s in docker) for development/testing, then **you will have to mount the docker host's /sys/fs/cgroup on all of the server/agent containers** (see the documentation for `k3d cluster create` but a quick example is something like: `k3d cluster create -v /sys/fs/cgroup:/sys/fs/cgroup@server[0]`).
 
 From the terminal, generally follow these steps:
 
@@ -48,7 +48,7 @@ Change 03-cluster.yaml (line 13) accordingly:
 ```
 
 
-5. Additional modifications to 03-cluster.yaml (ConfigMap ldap-login-slurm-conf, slurm.conf section) may be needed to match the 4 (default) worker agent pods to your machines' architecture(s) (sockets/cores/threads) and set the nodeSelector if you want to assign workers to particular nodes (see K8S docs if unsure, or just leave alone for testing purposes):
+5. Additional modifications to 03-cluster.yaml (ConfigMap openldap-login-public, slurm.conf section) may be needed to match the 4 (default) worker agent pods to your machines' architecture(s) (sockets/cores/threads) and uncomment pod antiaffinity rules in the StatefulSet for the agent pods if you want to distribute workers across nodes (see K8S docs if unsure, or just leave alone for testing purposes). In general, this config should match the number of agent replicas requested (here, 0-3):
 ```
 NodeName=agent-[0-3] Sockets=1 CoresPerSocket=8 ThreadsPerCore=1 State=UNKNOWN
 ```
@@ -153,11 +153,11 @@ Some cool things this deployment **DOES** do right:
 
 1. The current HPC cluster deployment can brought up and torn down on any K8S cluster.
 
-2. Nodes can be tagged and worker containers assigned to nodes using these tags.
+2. Nodes can be tagged and agent containers assigned to nodes using these tags, but just uncomment the antiaffinity rules provided in 03-cluster.yaml and agents will automatically distributed one-per-node (using hostname antiaffinity rules).
 
 3. A functioning Ubuntu 20.04 - OpenMPI/Singularity/SLURM deployment is provided so that *potentially any* scientific application can be run on the HPC cluster.
 
-4. Different clusters can be created in different K8S namespaces to provide unique cluster topologies.
+4. Different clusters can be created in different K8S namespaces to support unique/differing cluster topologies (nodeSelector and antiaffinity rules can be used to assign agents to relevant nodes).
 
 5. Both the NFS and OpenLDAP components can be easily replaced with exiting NFS or OpenLDAP infrastructure using K8S ConfigMaps.
 
@@ -169,9 +169,9 @@ At this point, the cluster is fully functional, but **VERY INSECURE**. You shoul
 
 2. The Munge private key is specified in 03-cluster.yaml file at the moment. Again, this should be edited and the key information kept safe from other users.
 
-3. We have done little-to-no testing of the security of the NFS service, so it might actually be mountable by other users which would be another major security hole.
+3. We have done little-to-no testing of the security of the NFS service, so it might actually be mountable by other users which would be another major security hole. There are networking guidelines in current k8s installations which suggest that this should not really be the case: it just needs to be confirmed.
 
-4. MPI traffic is no-doubt insecure, and so someone else on the same K8S cluster can potentially interfere with computations or obtain all information shared/passed among the compute nodes.
+4. MPI traffic is no-doubt insecure, and so someone else on the same K8S cluster can potentially interfere with computations or obtain all information shared/passed among the compute nodes. In general, it probably makes sense to run a seperate k8s installation on each cluster, or at least only only nodes where the users are trusted to run and inspect scientific applications (just like a standard HPC cluster). Some additional configuration is needed to prevent users from directly logging into the agents as well.
 
 Additional issues left to be fixed:
 
@@ -181,8 +181,6 @@ Additional issues left to be fixed:
 
 3. Currently, you will get a warning when the user logs in that the user's group has no name. This doesn't impact functionality in any significant way, but is annoying since it shows up when jobs are run on the scheduler, and when new shells start up.
 
-4. The user should preferably specify the worker node sockets/cores/threads setup in the 03-cluster.yaml (slurm.conf section) file.
-
-5. The number of workers is currently not flexible and they must be added/removed by adding/removing from the 03-cluster.yaml file.
+4. The user should preferably specify the worker node sockets/cores/threads setup in the 03-cluster.yaml (slurm.conf section) file and match this with the number of replicas requested by the agent StatefulSet.
 
 Copyright 2021 - MTSU CS S-STEM Summer Research Group
