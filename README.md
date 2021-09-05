@@ -183,4 +183,12 @@ Additional issues left to be fixed:
 
 4. The user should preferably specify the worker node sockets/cores/threads setup in the 03-cluster.yaml (slurm.conf section) file and match this with the number of replicas requested by the agent StatefulSet.
 
+# Contributors
+
+Daniel Cox
+Joshua L. Phillips (MTSU - Joshua.Phillips@mtsu.edu)
+Terryn Seaton
+Jessica Wijaya
+Hannah Williams
+
 Copyright 2021 - MTSU CS S-STEM Summer Research Group
