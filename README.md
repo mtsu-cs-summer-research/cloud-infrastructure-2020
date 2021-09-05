@@ -153,7 +153,7 @@ Some cool things this deployment **DOES** do right:
 
 1. The current HPC cluster deployment can brought up and torn down on any K8S cluster.
 
-2. Nodes can be tagged and agent containers assigned to nodes using these tags, but just uncomment the antiaffinity rules provided in 03-cluster.yaml and agents will automatically distributed one-per-node (using hostname antiaffinity rules).
+2. Nodes can be tagged and agent containers assigned to nodes using these tags, but just uncomment the antiaffinity rules provided in 03-cluster.yaml and agents will automatically be distributed one-per-node (using hostname antiaffinity rules).
 
 3. A functioning Ubuntu 20.04 - OpenMPI/Singularity/SLURM deployment is provided so that *potentially any* scientific application can be run on the HPC cluster.
 
