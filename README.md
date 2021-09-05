@@ -171,7 +171,7 @@ At this point, the cluster is fully functional, but **VERY INSECURE**. You shoul
 
 3. We have done little-to-no testing of the security of the NFS service, so it might actually be mountable by other users which would be another major security hole. There are networking guidelines in current k8s installations which suggest that this should not really be the case: it just needs to be confirmed.
 
-4. MPI traffic is no-doubt insecure, and so someone else on the same K8S cluster can potentially interfere with computations or obtain all information shared/passed among the compute nodes. In general, it probably makes sense to run a seperate k8s installation on each cluster, or at least only only nodes where the users are trusted to run and inspect scientific applications (just like a standard HPC cluster). Some additional configuration is needed to prevent users from directly logging into the agents as well.
+4. MPI traffic is no-doubt insecure, and so someone else on the same K8S cluster can potentially interfere with computations or obtain all information shared/passed among the compute nodes. In general, it probably makes sense to run a seperate k8s installation on each cluster, or at least only on nodes where the users are trusted to run and inspect scientific applications (just like a standard HPC cluster). Some additional configuration is needed to prevent users from directly logging into the agents as well.
 
 Additional issues left to be fixed:
 
