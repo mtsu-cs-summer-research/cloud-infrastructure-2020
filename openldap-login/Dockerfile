@@ -8,31 +8,39 @@ WORKDIR /root
 RUN yes | unminimize
 
 # BUILD DEPS for Singularity (may overlap with other below)
+# Tools needed for Singularity
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential \
     cryptsetup-bin \
+    libcap2-bin \
     libgpgme-dev \
     libseccomp-dev \
     pkg-config \
     git \
-    golang \
+    golang-1.16 \
     rsync \
     squashfs-tools \
     uuid-dev \
-    wget 
+    wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Download/Compile Singularity
 WORKDIR /root
-RUN wget https://github.com/hpcng/singularity/releases/download/v3.6.2/singularity-3.6.2.tar.gz
-RUN tar -xzf singularity-3.6.2.tar.gz
-WORKDIR /root/singularity
-RUN ./mconfig && \
-    make -C ./builddir && \
-    make -C ./builddir install
-WORKDIR /root
-RUN rm -rf singularity*
-RUN ln -s /usr/local/etc/bash_completion.d/singularity /etc/bash_completion.d/.
+# Download/Compile/Install Singularity
+ENV PATH="/usr/lib/go-1.16/bin:${PATH}"
+ENV GOCACHE="/root/gocache"
+RUN wget https://github.com/sylabs/singularity/releases/download/v3.9.2/singularity-ce-3.9.2.tar.gz && \
+    tar -xzf singularity-ce-3.9.2.tar.gz && \
+    cd singularity-ce-3.9.2 && \
+    ./mconfig && \                      
+    make -C ./builddir && \                          
+    make -C ./builddir install && \
+    cd .. && \
+    rm -rf singularity* && \
+    rm -rf /root/go* && \
+    ln -s /usr/local/etc/bash_completion.d/singularity /etc/bash_completion.d/.
 
 # DEPS for LDAP and PAM (MTSU Login and Debugging)
 RUN apt-get update && \
@@ -100,6 +108,9 @@ RUN echo "session optional        pam_mkhomedir.so skel=/etc/skel/ umask=0077" >
 # RUN echo -n "* " >> /etc/ssh/ssh_known_hosts && \
 #     cat /etc/ssh/ssh_host_ecdsa_key.pub >> /etc/ssh/ssh_known_hosts && \
 #     chmod 644 /etc/ssh/ssh_known_hosts
+
+# Make munge log to syslog
+RUN echo 'OPTIONS="--syslog"' >> /etc/default/munge
 
 # SSH - execution
 COPY startup.sh /usr/local/bin/.

@@ -1,13 +1,14 @@
 #!/bin/sh
 
-service xinetd start
-service nscd start
-service ssh start
-
 # Regenerate SSH host key
 /bin/rm -v /etc/ssh/ssh_host_*
 echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d
 RUNLEVEL=1 dpkg-reconfigure -f noninteractive openssh-server
+chmod 600 /etc/ssh/*_key
+
+service xinetd start
+service nscd start
+service ssh start
 
 if [ -f /etc/munge/munge.key.tmp ]; then
   echo "Configuring node for mpi cluster: `hostname`"
