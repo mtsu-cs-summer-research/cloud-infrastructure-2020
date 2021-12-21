@@ -153,7 +153,7 @@ Some cool things this deployment **DOES** do right:
 
 1. The current HPC cluster deployment can brought up and torn down on any K8S cluster.
 
-2. Nodes can be tagged and agent containers assigned to nodes using these tags, but just uncomment the antiaffinity rules provided in 03-cluster.yaml and agents will automatically distributed one-per-node (using hostname antiaffinity rules).
+2. Nodes can be tagged and agent containers assigned to nodes using these tags, but just uncomment the antiaffinity rules provided in 03-cluster.yaml and agents will automatically be distributed one-per-node (using hostname antiaffinity rules).
 
 3. A functioning Ubuntu 20.04 - OpenMPI/Singularity/SLURM deployment is provided so that *potentially any* scientific application can be run on the HPC cluster.
 
@@ -171,7 +171,7 @@ At this point, the cluster is fully functional, but **VERY INSECURE**. You shoul
 
 3. We have done little-to-no testing of the security of the NFS service, so it might actually be mountable by other users which would be another major security hole. There are networking guidelines in current k8s installations which suggest that this should not really be the case: it just needs to be confirmed.
 
-4. MPI traffic is no-doubt insecure, and so someone else on the same K8S cluster can potentially interfere with computations or obtain all information shared/passed among the compute nodes. In general, it probably makes sense to run a seperate k8s installation on each cluster, or at least only only nodes where the users are trusted to run and inspect scientific applications (just like a standard HPC cluster). Some additional configuration is needed to prevent users from directly logging into the agents as well.
+4. MPI traffic is no-doubt insecure, and so someone else on the same K8S cluster can potentially interfere with computations or obtain all information shared/passed among the compute nodes. In general, it probably makes sense to run a seperate k8s installation on each cluster, or at least only on nodes where the users are trusted to run and inspect scientific applications (just like a standard HPC cluster). Some additional configuration is needed to prevent users from directly logging into the agents as well.
 
 Additional issues left to be fixed:
 
@@ -186,9 +186,13 @@ Additional issues left to be fixed:
 # Contributors
 
 Daniel Cox
+
 Joshua L. Phillips (MTSU - Joshua.Phillips@mtsu.edu)
+
 Terryn Seaton
+
 Jessica Wijaya
+
 Hannah Williams
 
-Copyright 2021 - MTSU CS S-STEM Summer Research Group
+### Copyright 2021 - MTSU CS S-STEM Summer Research Group
