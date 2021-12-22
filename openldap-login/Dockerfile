@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM nvidia/cuda:11.2.2-cudnn8-runtime-ubuntu20.04
 LABEL maintainer="Joshua L. Phillips <https://www.cs.mtsu.edu/~jphillips/>"
 
 USER root
@@ -53,7 +53,9 @@ RUN apt-get update && \
     openssh-server \
     vim \
     wget \
-    xinetd
+    xinetd && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # HPC Software Support
 RUN apt-get update && \
@@ -65,7 +67,9 @@ RUN apt-get update && \
     munge \
     openmpi-bin \
     openmpi-common \
-    slurm-wlm
+    slurm-wlm && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Clean up before finalizing container
 RUN apt-get clean
