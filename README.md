@@ -4,7 +4,7 @@
 
 ## Purpose:
 
-This project aims to create a fully functioning HPC cluster deployable on Kubernetes. The cluster will utilize Singularity containers for software management so that the deployed HPC cluster is capable of running any scientific application over Singularity/OpenMPI/SLURM. An NFS server and OpenLDAP server are also used to provide the shared file system and user authentication for the cluster (these could be replaced with already-existing alternatives if need-be).
+This project aims to create a fully functioning HPC cluster deployable on Kubernetes. The cluster will utilize Singularity containers for software management so that the deployed HPC cluster is capable of running any scientific application over Singularity/OpenMPI/SLURM. An NFS server and OpenLDAP server are also used to provide the shared file system and user authentication for the cluster (these could be replaced with already-existing alternatives if need-be). One particularly relevant project to mention is Longhorn ([https://longhorn.io/](https://longhorn.io/)), since the NFS server deployment and PV/PVC used by the cluster can be replaced with a single longhorn PVC in RWX mode.
 
 ## TL;DR:
 
