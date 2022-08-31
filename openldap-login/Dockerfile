@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.6.0-cudnn8-runtime-ubuntu20.04
+FROM nvidia/cuda:11.7.1-base-ubuntu22.04
 LABEL maintainer="Joshua L. Phillips <https://www.cs.mtsu.edu/~jphillips/>"
 
 USER root
@@ -13,15 +13,13 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential \
     cryptsetup-bin \
-    libcap2-bin \
-    libgpgme-dev \
+    libglib2.0-dev \
     libseccomp-dev \
     pkg-config \
     git \
-    golang-1.16 \
+    golang \
     rsync \
     squashfs-tools \
-    uuid-dev \
     wget && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -29,11 +27,11 @@ RUN apt-get update && \
 # Download/Compile Singularity
 WORKDIR /root
 # Download/Compile/Install Singularity
-ENV PATH="/usr/lib/go-1.16/bin:${PATH}"
+# ENV PATH="/usr/lib/go-1.18/bin:${PATH}"
 ENV GOCACHE="/root/gocache"
-RUN wget https://github.com/sylabs/singularity/releases/download/v3.9.2/singularity-ce-3.9.2.tar.gz && \
-    tar -xzf singularity-ce-3.9.2.tar.gz && \
-    cd singularity-ce-3.9.2 && \
+RUN wget https://github.com/sylabs/singularity/releases/download/v3.10.2/singularity-ce-3.10.2.tar.gz && \
+    tar -xzf singularity-ce-3.10.2.tar.gz && \
+    cd singularity-ce-3.10.2 && \
     ./mconfig && \                      
     make -C ./builddir && \                          
     make -C ./builddir install && \
@@ -68,7 +66,8 @@ RUN apt-get update && \
     munge \
     openmpi-bin \
     openmpi-common \
-    slurm-wlm && \
+    slurm-wlm \
+    tzdata && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

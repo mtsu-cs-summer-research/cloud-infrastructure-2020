@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Configure timezone
+# ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Regenerate SSH host key
 /bin/rm -v /etc/ssh/ssh_host_*
 echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d
