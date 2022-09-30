@@ -20,7 +20,8 @@ RUN apt-get update && \
     golang \
     rsync \
     squashfs-tools \
-    wget && \
+    wget \
+    zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
