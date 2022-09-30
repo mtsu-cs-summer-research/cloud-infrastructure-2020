@@ -1,0 +1,77 @@
+FROM nvidia/cuda:11.7.1-base-rockylinux8
+
+## Singularity Prerequisites
+RUN yum -y update && \
+    yum groupinstall -y 'Development Tools' && \
+    dnf install -y \
+        libseccomp-devel \
+        glib2-devel \
+        squashfs-tools \
+        cryptsetup \
+        runc \
+	golang \
+	wget \
+	&& yum clean all
+
+## Singularity Build/Install
+WORKDIR /root
+ENV GOCACHE="/root/gocache"
+RUN wget https://github.com/sylabs/singularity/releases/download/v3.10.2/singularity-ce-3.10.2.tar.gz && \
+    tar -xzf singularity-ce-3.10.2.tar.gz && \
+    cd singularity-ce-3.10.2 && \
+    ./mconfig && \                      
+    make -C ./builddir && \                          
+    make -C ./builddir install && \
+    cd .. && \
+    rm -rf singularity* && \
+    rm -rf /root/go* && \
+    ln -s /usr/local/etc/bash_completion.d/singularity /etc/bash_completion.d/.
+
+## HPC Support
+RUN yum -y update && \
+    dnf install -y dnf-plugins-core epel-release && \
+    dnf config-manager --set-enabled powertools && \
+    dnf install -y \
+    	munge \
+	openmpi \
+        slurm \
+	&& yum clean all
+
+# Make munge log to syslog
+RUN echo 'OPTIONS="--syslog"' >> /etc/default/munge
+
+## LDAP Authentication Support
+RUN yum update -y && \
+    yum install -y \
+        dnsutils \
+        # finger \
+        openldap-clients \
+        nss-pam-ldapd \
+        nscd \
+	oddjob-mkhomedir \
+        openssh-server \
+        vim \
+        wget \
+	&& yum clean all
+
+## Configure LDAP
+RUN cp /etc/nsswitch.conf /etc/nsswitch.conf.bak && \
+    cat /etc/nsswitch.conf.bak | \
+    sed -e '/^passwd:/ s/$/ ldap/' | \
+    sed -e '/^group:/ s/$/ ldap/' | \
+    sed -e '/^shadow:/ s/$/ ldap/' > /etc/nsswitch.conf
+# Note that this assumes Bitnami OpenLDAP container
+# is part of the deployment... you could use a
+# ConfigMap to modify this.
+RUN cp /etc/nslcd.conf /etc/nslcd.conf.bak && \
+    echo "uid nslcd" > /etc/nslcd.conf && \
+    echo "gid ldap" >> /etc/nslcs.conf && \
+    echo "base dc=example,dc=org" > /etc/nslcd.conf && \
+    echo "uri ldap://openldap:1389/" >> /etc/nslcd.conf && \
+    echo "ldap_version 3" >> /etc/nslcd.conf && \
+    echo "pam_password md5" >> /etc/nslcd.conf
+
+# SSH - execution
+COPY startup.sh /usr/local/bin/.
+WORKDIR /srv/openldap-login
+CMD ["/usr/local/bin/startup.sh"]
