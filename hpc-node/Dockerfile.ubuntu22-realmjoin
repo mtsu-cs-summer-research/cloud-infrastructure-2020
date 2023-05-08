@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.7.1-base-ubuntu22.04
+FROM nvidia/cuda:11.8.0-base-ubuntu22.04
 LABEL maintainer="Joshua L. Phillips <https://www.cs.mtsu.edu/~jphillips/>"
 
 USER root
@@ -10,6 +10,7 @@ RUN yes | unminimize
 # BUILD DEPS for Singularity (may overlap with other below)
 # Tools needed for Singularity
 RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential \
     cryptsetup-bin \
@@ -28,9 +29,9 @@ RUN apt-get update && \
 # Download/Compile/Install Singularity
 # ENV PATH="/usr/lib/go-1.18/bin:${PATH}"
 ENV GOCACHE="/root/gocache"
-RUN wget https://github.com/sylabs/singularity/releases/download/v3.10.2/singularity-ce-3.10.2.tar.gz && \
-    tar -xzf singularity-ce-3.10.2.tar.gz && \
-    cd singularity-ce-3.10.2 && \
+RUN wget https://github.com/sylabs/singularity/releases/download/v3.11.3/singularity-ce-3.11.3.tar.gz && \
+    tar -xzf singularity-ce-3.11.3.tar.gz && \
+    cd singularity-ce-3.11.3 && \
     ./mconfig && \                      
     make -C ./builddir && \                          
     make -C ./builddir install && \
@@ -95,6 +96,6 @@ RUN echo "session optional        pam_mkhomedir.so skel=/etc/skel/ umask=0077" >
 RUN echo 'OPTIONS="--syslog"' >> /etc/default/munge
 
 # SSH - execution
-COPY startup.sh /usr/local/bin/.
-WORKDIR /srv/openldap-login
-CMD ["/usr/local/bin/startup.sh"]
+COPY startup.bash /usr/local/bin/.
+WORKDIR /srv/hpc-node
+CMD ["/usr/local/bin/startup.bash"]

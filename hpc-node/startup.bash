@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Configure timezone
 # ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -16,12 +16,12 @@ if [ -f /etc/munge/munge.key.tmp ]; then
 
   systemctl enable munge
 
-  if [ `hostname` != 'scheduler' ]; then
-    echo "Node type: agent"
+  if [[ `hostname` =~ ^node-[0-9]+$ ]]; then
+    echo "Node type: compute"
     systemctl disable slurmctld
     systemctl enable slurmd
   else
-    echo "Node type: scheduler"
+    echo "Node type: login"
     systemctl enable slurmctld
     systemctl disable slurmd
   fi
