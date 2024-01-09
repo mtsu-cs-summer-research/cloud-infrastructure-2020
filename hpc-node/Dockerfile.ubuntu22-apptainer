@@ -1,0 +1,106 @@
+FROM nvidia/cuda:12.2.0-base-ubuntu22.04
+LABEL maintainer="Joshua L. Phillips <https://www.cs.mtsu.edu/~jphillips/>"
+
+USER root
+
+# Make this a user-friendly container (Ubuntu Server)
+WORKDIR /root
+RUN yes | unminimize
+
+# BUILD DEPS for Singularity (may overlap with other below)
+# Tools needed for Singularity
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    build-essential \
+    cryptsetup-bin \
+    libglib2.0-dev \
+    libseccomp-dev \
+    pkg-config \
+    git \
+    golang \
+    rsync \
+    software-properties-common \
+    squashfs-tools \
+    wget \
+    && \
+    DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:apptainer/ppa \
+    && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y apptainer \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download/Compile/Install Singularity
+# ENV PATH="/usr/lib/go-1.18/bin:${PATH}"
+ENV GOCACHE="/root/gocache"
+RUN wget https://github.com/sylabs/singularity/releases/download/v3.11.3/singularity-ce-3.11.3.tar.gz && \
+    tar -xzf singularity-ce-3.11.3.tar.gz && \
+    cd singularity-ce-3.11.3 && \
+    ./mconfig && \                      
+    make -C ./builddir && \                          
+    make -C ./builddir install && \
+    cd .. && \
+    rm -rf singularity* && \
+    rm -rf /root/go* && \
+    ln -s /usr/local/etc/bash_completion.d/singularity /etc/bash_completion.d/.
+
+# Authentication/User Management Support
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    adcli \
+    dnsutils \
+    finger \
+    krb5-user \
+    libnss-sss \
+    libpam-sss \
+    ntp \
+    ntpdate \
+    openssh-server \
+    packagekit \
+    realmd \
+    samba \
+    sssd \
+    sssd-tools \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# HPC Software Support
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    libmunge-dev \
+    libmunge2 \
+    libopenmpi-dev \
+    locales-all \
+    # mpich \
+    munge \
+    openmpi-bin \
+    openmpi-common \
+    slurm-wlm \
+    tzdata \
+    vim \
+    zip \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Allow for automatic home directory creation
+RUN echo "session optional        pam_mkhomedir.so skel=/etc/skel/ umask=0077" >> /etc/pam.d/common-session
+
+# SSH - no host key confirmation
+# Make current host key auto-login via known_hosts.
+# This is generally a BAD idea, but we used it
+# some during testing and decided to leave it
+# documented here if it's useful for someone...
+# RUN echo -n "* " >> /etc/ssh/ssh_known_hosts && \
+#     cat /etc/ssh/ssh_host_ecdsa_key.pub >> /etc/ssh/ssh_known_hosts && \
+#     chmod 644 /etc/ssh/ssh_known_hosts
+
+# Make munge log to syslog
+RUN echo 'OPTIONS="--syslog"' >> /etc/default/munge
+
+# SSH - execution
+COPY startup.bash /usr/local/bin/.
+WORKDIR /srv/hpc-node
+CMD ["/usr/local/bin/startup.bash"]
