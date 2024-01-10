@@ -1,1 +1,1 @@
-Dockerfile.ubuntu22-realmjoin
+Dockerfile.ubuntu22-apptainer
